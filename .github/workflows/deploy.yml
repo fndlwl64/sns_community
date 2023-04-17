@@ -24,7 +24,6 @@ jobs:
 
       - name: Build react-scripts
         run: chmod +x front-end/node_modules/.bin/react-scripts
-
         shell: bash
 
       - name: Deploy to Heroku
