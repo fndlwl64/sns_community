@@ -22,9 +22,13 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
+      - name: Build react-scripts
+        run: chmod +x front-end/node_modules/.bin/react-scripts
+
+        shell: bash
+
       - name: Deploy to Heroku
         uses: AkhileshNS/heroku-deploy@v3.12.12
-        run: chmod +x node_modules/.bin/react-scripts
         with:
           # This will be used for authentication. You can find it in your heroku homepage account settings
           heroku_api_key: ${{ secrets.HEROKU_DEPLOY_KEY }}
