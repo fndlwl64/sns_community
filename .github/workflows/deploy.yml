@@ -22,10 +22,6 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v3
 
-      - name: Build react-scripts
-        run: chmod +x front-end/node_modules/.bin/react-scripts
-        shell: bash
-
       - name: Deploy to Heroku
         uses: AkhileshNS/heroku-deploy@v3.12.12
         with:
