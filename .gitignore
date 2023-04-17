@@ -258,3 +258,8 @@ replay_pid*
 # End of https://www.toptal.com/developers/gitignore/api/intellij,intellij+all,intellij+iml,java
 # Project exclude paths
 /.gradle/
+
+# front-end
+
+**/front-end/node_modules/**
+**/front-end/static/**
