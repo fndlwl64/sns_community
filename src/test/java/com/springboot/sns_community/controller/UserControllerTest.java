@@ -79,7 +79,7 @@ public class UserControllerTest {
         String name = "name";
         String password = "password";
 
-        when(userService.login(name,password)).thenThrow(new SnsApplicationException(ErrorCode.DUPLICATED_USER_NAME,""));
+        when(userService.login(name,password)).thenThrow(new SnsApplicationException(ErrorCode.USER_NOT_FOUND));
 
         mvc.perform(post("/api/v1/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -93,7 +93,7 @@ public class UserControllerTest {
         String name = "name";
         String password = "password";
 
-        when(userService.login(name,password)).thenThrow(new SnsApplicationException(ErrorCode.DUPLICATED_USER_NAME,""));
+        when(userService.login(name,password)).thenThrow(new SnsApplicationException(ErrorCode.INVALID_PASSWORD));
 
         mvc.perform(post("/api/v1/users/login")
                         .contentType(MediaType.APPLICATION_JSON)
