@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class UserService {
+public class UserService{
 
     private final UserEntityRepository userEntityRepository;
     private final BCryptPasswordEncoder encoder;
@@ -24,6 +24,11 @@ public class UserService {
 
     @Value("${jwt.token.expired-time-ms}")
     private Long expiredTimeMs;
+
+    public User loadUserByUserName(String username) {
+        return userEntityRepository.findByUserName(username).map(User::fromEntity).orElseThrow(()->
+                new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded",username)));
+    }
 
     @Transactional
     public User join(String userName, String password){
