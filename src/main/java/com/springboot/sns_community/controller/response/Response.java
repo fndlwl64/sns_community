@@ -10,6 +10,7 @@ public class Response<T> {
     private String resultCode;
     private T result;
 
+    public static <T> Response <T> success(){ return new Response<T>("SUCCESS",null);}
     public static Response<Void> error(String errorCode) {
         return new Response<>(errorCode, null);
     }
