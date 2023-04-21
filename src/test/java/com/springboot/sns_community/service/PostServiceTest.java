@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.Optional;
 
@@ -113,6 +115,67 @@ public class PostServiceTest {
 
     }
 
+    @Test
+    void delete_post(){
+        String userName = "userName";
+        Integer postId = 1;
 
+        PostEntity postEntity = PostEntityFixture.get(userName, postId,1);
+        UserEntity userEntity = postEntity.getUser();
+        //mocking
+
+        when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.of(userEntity));
+        when(postEntityRepository.findById(postId)).thenReturn(Optional.of(postEntity));
+
+        Assertions.assertDoesNotThrow(()->postService.delete(userName,1));
+    }
+    @Test
+    void delete_post_if_post_not_exist(){
+        String userName = "userName";
+        Integer postId = 1;
+
+        PostEntity postEntity = PostEntityFixture.get(userName, postId,1);
+        UserEntity userEntity = postEntity.getUser();
+        //mocking
+
+        when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.of(userEntity));
+        when(postEntityRepository.findById(postId)).thenReturn(Optional.empty());
+
+        SnsApplicationException e = Assertions.assertThrows(SnsApplicationException.class,()->postService.delete(userName,1));
+        Assertions.assertEquals(ErrorCode.POST_NOT_FOUND,e.getErrorCode());
+
+    }
+
+    @Test
+    void delete_post_if_not_authorized(){
+        String userName = "userName";
+        Integer postId = 1;
+
+        PostEntity postEntity = PostEntityFixture.get(userName, postId,1);
+        UserEntity writer = UserEntityFixture.get("userName1","password",postId);
+        //mocking
+
+        when(userEntityRepository.findByUserName(userName)).thenReturn(Optional.of(writer));
+        when(postEntityRepository.findById(postId)).thenReturn(Optional.of(postEntity));
+
+        SnsApplicationException e = Assertions.assertThrows(SnsApplicationException.class,()->postService.delete(userName,1));
+        Assertions.assertEquals(ErrorCode.INVALID_PERMISSION,e.getErrorCode());
+
+    }
+
+    @Test
+    void feedback_list(){
+        Pageable pageable = mock(Pageable.class);
+        when(postEntityRepository.findAll(pageable)).thenReturn(Page.empty());
+        Assertions.assertDoesNotThrow(()->postService.list(pageable));
+    }
+    @Test
+    void feedback(){
+        Pageable pageable = mock(Pageable.class);
+        UserEntity userEntity = mock(UserEntity.class);
+        when(userEntityRepository.findByUserName(any())).thenReturn(Optional.of(userEntity));
+        when(postEntityRepository.findAllByUser(userEntity,pageable)).thenReturn(Page.empty());
+        Assertions.assertDoesNotThrow(()->postService.my("",pageable));
+    }
 
 }

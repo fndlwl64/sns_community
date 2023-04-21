@@ -45,22 +45,22 @@ node {
 	download = true
 }
 
-task npmBuild(type: NpmTask){
+task npmBuild(type: NpmTask) {
 	args = ['run', "build"]
 }
 
-task copyFrontEnd(type: Copy){
+task copyFrontEnd(type: Copy) {
 	from "$projectDir/front-end/static"
-	into 'build/resources/main/static'
+	into 'build/resources/main/static/.'
 }
 
-task cleanFrontEnd(type: Delete){
+task cleanFrontEnd(type: Delete) {
 	delete "$projectDir/front-end/static", "$projectDir/front-end/node_modules"
 }
 
-//npmBuild.dependsOn npmInstall
-//copyFrontEnd.dependsOn npmBuild
-//compileJava.dependsOn copyFrontEnd
-//
-//clean.dependsOn cleanFrontEnd
+npmBuild.dependsOn npmInstall
+copyFrontEnd.dependsOn npmBuild
+compileJava.dependsOn copyFrontEnd
+
+clean.dependsOn cleanFrontEnd
 
