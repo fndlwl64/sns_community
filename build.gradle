@@ -66,10 +66,10 @@ tasks.withType(NpmTask) {
 tasks.withType(JavaCompile) {
 	outputs.cacheIf { true }
 }
-
-npmBuild.dependsOn npmInstall
-copyFrontEnd.dependsOn npmBuild
-compileJava.dependsOn copyFrontEnd
-
-clean.dependsOn cleanFrontEnd
+//
+//npmBuild.dependsOn npmInstall
+//copyFrontEnd.dependsOn npmBuild
+//compileJava.dependsOn copyFrontEnd
+//
+//clean.dependsOn cleanFrontEnd
 
