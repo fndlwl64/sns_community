@@ -1,6 +1,7 @@
 package com.springboot.sns_community.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.springboot.sns_community.controller.request.PostCommentRequest;
 import com.springboot.sns_community.controller.request.PostCreateRequest;
 import com.springboot.sns_community.controller.request.PostModifyRequest;
 import com.springboot.sns_community.exception.ErrorCode;
@@ -231,6 +232,40 @@ public class PostControllerTest {
 
         mvc.perform(post("/api/v1/posts/1/likes")
                         .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @WithMockUser
+    void comment() throws Exception{
+        mvc.perform(post("/api/v1/posts/1/comments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(new PostCommentRequest("comment")))
+                )
+                .andDo(print())
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithAnonymousUser
+    void comment_if_not_user() throws Exception{
+        mvc.perform(post("/api/v1/posts/1/comments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(new PostCommentRequest("comment")))
+                )
+                .andDo(print())
+                .andExpect(status().isUnauthorized());
+    }
+    @Test
+    @WithMockUser
+    void comment_if_post_not_exist() throws Exception{
+        doThrow(new SnsApplicationException(ErrorCode.POST_NOT_FOUND)).when(postService).comment(any(), any(),any());
+
+        mvc.perform(post("/api/v1/posts/1/comments")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(new PostCommentRequest("comment")))
+                )
                 .andDo(print())
                 .andExpect(status().isNotFound());
     }

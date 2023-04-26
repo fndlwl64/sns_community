@@ -1,7 +1,9 @@
 package com.springboot.sns_community.controller;
 
+import com.springboot.sns_community.controller.request.PostCommentRequest;
 import com.springboot.sns_community.controller.request.PostCreateRequest;
 import com.springboot.sns_community.controller.request.PostModifyRequest;
+import com.springboot.sns_community.controller.response.CommentResponse;
 import com.springboot.sns_community.controller.response.PostResponse;
 import com.springboot.sns_community.controller.response.Response;
 import com.springboot.sns_community.model.Post;
@@ -59,5 +61,17 @@ public class PostController {
     public Response<Integer> likeCount(@PathVariable Integer postId, Authentication authentication) {
         return Response.success(postService.likeCount(postId));
     }
+
+    @PostMapping("/{postId}/comments")
+    public Response<Void> comment(@PathVariable Integer postId, @RequestBody PostCommentRequest request, Authentication authentication) {
+        postService.comment(postId, authentication.getName(),request.getComment());
+        return Response.success();
+    }
+    @GetMapping("/{postId}/comments")
+    public Response<Page<CommentResponse>> commentList(@PathVariable Integer postId, Pageable pageable, @RequestBody PostCommentRequest request, Authentication authentication) {
+        postService.getComment(postId,pageable);
+        return Response.success(postService.getComment(postId,pageable).map(CommentResponse::fromComment));
+    }
+
 
 }
