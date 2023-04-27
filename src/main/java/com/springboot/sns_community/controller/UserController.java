@@ -2,16 +2,17 @@ package com.springboot.sns_community.controller;
 
 import com.springboot.sns_community.controller.request.UserJoinRequest;
 import com.springboot.sns_community.controller.request.UserLoginRequest;
+import com.springboot.sns_community.controller.response.AlarmResponse;
 import com.springboot.sns_community.controller.response.Response;
 import com.springboot.sns_community.controller.response.UserJoinResponse;
 import com.springboot.sns_community.controller.response.UserLoginResponse;
 import com.springboot.sns_community.model.User;
 import com.springboot.sns_community.service.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -32,5 +33,10 @@ public class UserController {
     public Response<UserLoginResponse> login(@RequestBody UserLoginRequest request) {
         String token = userService.login(request.getName(), request.getPassword());
         return Response.success(new UserLoginResponse(token));
+    }
+
+    @GetMapping("/alarm")
+    public Response<Page<AlarmResponse>> alarm(Pageable pageable, Authentication authentication) {
+        return Response.success( userService.alarmList(authentication.getName(),pageable).map(AlarmResponse::fromEntity));
     }
 }

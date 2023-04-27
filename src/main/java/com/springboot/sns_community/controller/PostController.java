@@ -68,8 +68,8 @@ public class PostController {
         return Response.success();
     }
     @GetMapping("/{postId}/comments")
-    public Response<Page<CommentResponse>> commentList(@PathVariable Integer postId, Pageable pageable, @RequestBody PostCommentRequest request, Authentication authentication) {
-        postService.getComment(postId,pageable);
+    public Response<Page<CommentResponse>> commentList(@PathVariable Integer postId, Pageable pageable, Authentication authentication) {
+        //postService.getComment(postId,pageable);
         return Response.success(postService.getComment(postId,pageable).map(CommentResponse::fromComment));
     }
 

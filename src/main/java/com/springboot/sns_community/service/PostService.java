@@ -2,16 +2,12 @@ package com.springboot.sns_community.service;
 
 import com.springboot.sns_community.exception.ErrorCode;
 import com.springboot.sns_community.exception.SnsApplicationException;
+import com.springboot.sns_community.model.AlarmArgs;
+import com.springboot.sns_community.model.AlarmType;
 import com.springboot.sns_community.model.Comment;
 import com.springboot.sns_community.model.Post;
-import com.springboot.sns_community.model.entity.CommentEntity;
-import com.springboot.sns_community.model.entity.LikeEntity;
-import com.springboot.sns_community.model.entity.PostEntity;
-import com.springboot.sns_community.model.entity.UserEntity;
-import com.springboot.sns_community.repository.CommentEntityRepository;
-import com.springboot.sns_community.repository.LikeEntityRepository;
-import com.springboot.sns_community.repository.PostEntityRepository;
-import com.springboot.sns_community.repository.UserEntityRepository;
+import com.springboot.sns_community.model.entity.*;
+import com.springboot.sns_community.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,6 +23,8 @@ public class PostService {
     private final UserEntityRepository userEntityRepository;
     private final LikeEntityRepository likeEntityRepository;
     private final CommentEntityRepository commentEntityRepository;
+    private final AlarmEntityRepository alarmEntityRepository;
+
     @Transactional
     public void create(String title, String body, String userName) {
         UserEntity userEntity = userEntityRepository.findByUserName(userName).orElseThrow(()->new SnsApplicationException(ErrorCode.USER_NOT_FOUND,String.format("%s not founded",userName)));
@@ -72,7 +70,6 @@ public class PostService {
     @Transactional
     public void like(Integer postId, String userName) {
         UserEntity userEntity = getUserOrException(userName);
-
         //post exist
         PostEntity postEntity = getPostOrException(postId);
 
@@ -85,6 +82,8 @@ public class PostService {
 
         // like save
         likeEntityRepository.save(LikeEntity.of(userEntity, postEntity));
+
+        alarmEntityRepository.save(AlarmEntity.of(postEntity.getUser(), AlarmType.NEW_LIKE_ON_POST,new AlarmArgs(userEntity.getId(),postEntity.getId())));
     }
     @Transactional
     public int likeCount(Integer postId) {
@@ -103,6 +102,7 @@ public class PostService {
         //comment save
         commentEntityRepository.save(CommentEntity.of(userEntity, postEntity, comment));
 
+        alarmEntityRepository.save(AlarmEntity.of(postEntity.getUser(), AlarmType.NEW_COMMENT_ON_POST,new AlarmArgs(userEntity.getId(),postEntity.getId())));
     }
 
     public Page<Comment> getComment(Integer postId, Pageable pageable) {
