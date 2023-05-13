@@ -7,7 +7,6 @@ import com.springboot.sns_community.controller.response.CommentResponse;
 import com.springboot.sns_community.controller.response.PostResponse;
 import com.springboot.sns_community.controller.response.Response;
 import com.springboot.sns_community.model.Post;
-//import com.springboot.sns_community.repository.UserEntityRepository;
 import com.springboot.sns_community.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -58,7 +57,7 @@ public class PostController {
         return Response.success();
     }
     @GetMapping("/{postId}/likes")
-    public Response<Integer> likeCount(@PathVariable Integer postId, Authentication authentication) {
+    public Response<Long> likeCount(@PathVariable Integer postId, Authentication authentication) {
         return Response.success(postService.likeCount(postId));
     }
 
