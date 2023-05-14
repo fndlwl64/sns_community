@@ -6,6 +6,7 @@ import com.springboot.sns_community.model.Alarm;
 import com.springboot.sns_community.model.User;
 import com.springboot.sns_community.model.entity.UserEntity;
 import com.springboot.sns_community.repository.AlarmEntityRepository;
+import com.springboot.sns_community.repository.UserCacheRepository;
 import com.springboot.sns_community.repository.UserEntityRepository;
 import com.springboot.sns_community.util.JwtTokenUtils;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class UserService{
     private final UserEntityRepository userEntityRepository;
     private final BCryptPasswordEncoder encoder;
     private final AlarmEntityRepository alarmRepository;
+    private final UserCacheRepository userCacheRepository;
 
     @Value("${jwt.secret-key}")
     private String secretKey;
@@ -30,9 +32,11 @@ public class UserService{
     @Value("${jwt.token.expired-time-ms}")
     private Long expiredTimeMs;
 
-    public User loadUserByUserName(String username) {
-        return userEntityRepository.findByUserName(username).map(User::fromEntity).orElseThrow(()->
-                new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded",username)));
+    public User loadUserByUserName(String userName) {
+        return userCacheRepository.getUser(userName).orElseGet(()->
+                userEntityRepository.findByUserName(userName).map(User::fromEntity).orElseThrow(()->
+                        new SnsApplicationException(ErrorCode.USER_NOT_FOUND, String.format("%s not founded",userName)))
+        );
     }
 
     @Transactional
@@ -49,10 +53,11 @@ public class UserService{
 
     public String login(String userName, String password){
         //회원가입 여부
-        UserEntity userEntity = userEntityRepository.findByUserName(userName).orElseThrow(() -> new SnsApplicationException(ErrorCode.USER_NOT_FOUND,String.format("%s not founded",userName)));
+        User user = loadUserByUserName(userName);
+        userCacheRepository.setUser(user);
 
         //비밀번호 체크
-        if (!encoder.matches(password,userEntity.getPassword())){
+        if (!encoder.matches(password,user.getPassword())){
             throw new SnsApplicationException(ErrorCode.INVALID_PASSWORD);
         }
 
@@ -62,7 +67,6 @@ public class UserService{
     }
 
     public Page<Alarm> alarmList(Integer userId, Pageable pageable) {
-        return alarmRepository.findALLByUserId(userId,pageable).map(Alarm::fromEntity);
-
+            return alarmRepository.findALLByUserId(userId,pageable).map(Alarm::fromEntity);
     }
 }

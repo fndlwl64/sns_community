@@ -16,3 +16,5 @@ spring.datasource:
 jwt:
   secret-key: fndlwl64.sns-community-2023.secret-key
   token.expired-time-ms: 2592000000 # 30 days
+
+spring.redis.url: redis://:p65eb9a1e5ea9aa81b9ce30ebec492ac27e63a94e6a0d7cdd445c52f812f2e5b9@ec2-44-193-33-108.compute-1.amazonaws.com:27489
