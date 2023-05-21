@@ -4,6 +4,7 @@ package com.springboot.sns_community.configuration.filter;
 import com.springboot.sns_community.model.User;
 import com.springboot.sns_community.service.UserService;
 import com.springboot.sns_community.util.JwtTokenUtils;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -17,6 +18,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -24,18 +26,26 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private final String key;
     private final UserService userService;
 
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        //get header
-        final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (header == null || !header.startsWith("Bearer ")) {
-            log.error("Error occurs while getting header. header is null or invalid {}", request.getRequestURL());
-            filterChain.doFilter(request,response);
-            return;
-        }
+    private final static List<String> TOKEN_IN_PARAM_URLS = List.of("/api/v1/users/alarms/subscribe");
 
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+        //get header
+        final String token;
         try{
-            final String token = header.split(" ")[1].trim();
+            if(TOKEN_IN_PARAM_URLS.contains(request.getRequestURI())){
+                log.info("Request with {} check the query param", request.getRequestURI());
+                token = request.getQueryString().split("=")[1].trim();
+            }else{
+                final String header = request.getHeader(HttpHeaders.AUTHORIZATION);
+                if (header == null || !header.startsWith("Bearer ")) {
+                    log.error("Error occurs while getting header. header is null or invalid {}", request.getRequestURI());
+                    filterChain.doFilter(request,response);
+                    return;
+                }
+                token = header.split(" ")[1].trim();
+            }
+
             if(JwtTokenUtils.isExpired(token,key)){
                 log.error("Key is expired");
                 filterChain.doFilter(request,response);

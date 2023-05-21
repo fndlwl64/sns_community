@@ -59,16 +59,16 @@ task copyFrontEnd(type: Copy) {
 
 task cleanFrontEnd(type: Delete) {
 	delete "$projectDir/front-end/static", "$projectDir/front-end/node_modules"
-	outputs.upToDateWhen { false }
+	/*outputs.upToDateWhen { false }*/
 }
 /*캐시 처리로 빌드 최적화*/
-tasks.withType(NpmTask) {
+/*tasks.withType(NpmTask) {
 	outputs.cacheIf { true }
 }
 
 tasks.withType(JavaCompile) {
 	outputs.cacheIf { true }
-}
+}*/
 //
 //npmBuild.dependsOn npmInstall
 //copyFrontEnd.dependsOn npmBuild

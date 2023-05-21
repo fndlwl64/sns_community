@@ -9,20 +9,24 @@ import com.springboot.sns_community.controller.response.UserLoginResponse;
 import com.springboot.sns_community.exception.ErrorCode;
 import com.springboot.sns_community.exception.SnsApplicationException;
 import com.springboot.sns_community.model.User;
+import com.springboot.sns_community.service.AlarmService;
 import com.springboot.sns_community.service.UserService;
 import com.springboot.sns_community.util.ClassUtils;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
+    private final AlarmService alarmService;
 
     // TODO : implement
     @PostMapping("/join")
@@ -44,5 +48,14 @@ public class UserController {
                 () -> new SnsApplicationException(ErrorCode.INTERNAL_SERVER_ERROR,
                 "Casting to User class failed"));
         return Response.success( userService.alarmList(user.getId(),pageable).map(AlarmResponse::fromEntity));
+    }
+
+    @GetMapping("/alarm/subscribe")
+    public SseEmitter subscribe(Authentication authentication){
+        log.info("subscribe");
+        User user = ClassUtils.getSafeCastInstance(authentication.getPrincipal(),User.class).orElseThrow(
+                () -> new SnsApplicationException(ErrorCode.INTERNAL_SERVER_ERROR,
+                        "Casting to User class failed"));
+        return alarmService.connectAlarm(user.getId());
     }
 }
