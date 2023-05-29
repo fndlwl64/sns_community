@@ -4,7 +4,6 @@ package com.springboot.sns_community.configuration.filter;
 import com.springboot.sns_community.model.User;
 import com.springboot.sns_community.service.UserService;
 import com.springboot.sns_community.util.JwtTokenUtils;
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -26,7 +25,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
     private final String key;
     private final UserService userService;
 
-    private final static List<String> TOKEN_IN_PARAM_URLS = List.of("/api/v1/users/alarms/subscribe");
+    private final static List<String> TOKEN_IN_PARAM_URLS = List.of("/api/v1/users/alarm/subscribe");
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
